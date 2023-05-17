@@ -1,0 +1,10 @@
+Changes in version 0.1:
+  - First release under the new name PariTwine.
+  - Use of autotools with automatic detection of available libraries to wrap.
+  - Added documentation in texinfo format.
+  - Many new wrapped functions, in particular from the newly supported
+    libraries FLINT, ARB and CMH.
+
+Version 0.0.1:
+  - Initial release under the name Pari-gnump.
+

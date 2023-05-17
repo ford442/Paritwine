@@ -1,0 +1,26 @@
+install ("pari_mpc_add", "GGb", "mpc_add", LIBPARITWINESO);
+install ("pari_mpc_sub", "GGb", "mpc_sub", LIBPARITWINESO);
+install ("pari_mpc_mul", "GGb", "mpc_mul", LIBPARITWINESO);
+install ("pari_mpc_sqr", "Gb", "mpc_sqr", LIBPARITWINESO);
+install ("pari_mpc_div", "GGb", "mpc_div", LIBPARITWINESO);
+install ("pari_mpc_fma", "GGGb", "mpc_fma", LIBPARITWINESO);
+install ("pari_mpc_abs", "Gb", "mpc_abs", LIBPARITWINESO);
+install ("pari_mpc_norm", "Gb", "mpc_norm", LIBPARITWINESO);
+install ("pari_mpc_pow", "GGb", "mpc_pow", LIBPARITWINESO);
+install ("pari_mpc_sqrt", "Gb", "mpc_sqrt", LIBPARITWINESO);
+install ("pari_mpc_exp", "Gb", "mpc_exp", LIBPARITWINESO);
+install ("pari_mpc_log", "Gb", "mpc_log", LIBPARITWINESO);
+install ("pari_mpc_log10", "Gb", "mpc_log10", LIBPARITWINESO);
+install ("pari_mpc_sin", "Gb", "mpc_sin", LIBPARITWINESO);
+install ("pari_mpc_cos", "Gb", "mpc_cos", LIBPARITWINESO);
+install ("pari_mpc_tan", "Gb", "mpc_tan", LIBPARITWINESO);
+install ("pari_mpc_asin", "Gb", "mpc_asin", LIBPARITWINESO);
+install ("pari_mpc_acos", "Gb", "mpc_acos", LIBPARITWINESO);
+install ("pari_mpc_atan", "Gb", "mpc_atan", LIBPARITWINESO);
+install ("pari_mpc_sinh", "Gb", "mpc_sinh", LIBPARITWINESO);
+install ("pari_mpc_cosh", "Gb", "mpc_cosh", LIBPARITWINESO);
+install ("pari_mpc_tanh", "Gb", "mpc_tanh", LIBPARITWINESO);
+install ("pari_mpc_asinh", "Gb", "mpc_asinh", LIBPARITWINESO);
+install ("pari_mpc_acosh", "Gb", "mpc_acosh", LIBPARITWINESO);
+install ("pari_mpc_atanh", "Gb", "mpc_atanh", LIBPARITWINESO);
+

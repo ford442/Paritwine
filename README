@@ -1,0 +1,5 @@
+PariTwine is a glue library between the system for computer algebra and
+number theory PARI/GP and a number of other mathematics libraries.
+
+For more details, please see the texinfo documentation in doc/paritwine.texi.
+

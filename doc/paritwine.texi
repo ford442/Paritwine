@@ -1,0 +1,823 @@
+\input texinfo
+@setfilename paritwine.info
+@include version.texi
+@settitle PariTwine @value{VERSION}
+
+@set AUTHORS Andreas Enge, Fredrik Johansson
+
+@iftex
+@afourpaper
+@end iftex
+
+@copying
+This manual is for PariTwine, a library to convert between multiprecision
+types of PARI/GP and external libraries, and to wrap functions from these
+libraries for use in GP,
+version @value{VERSION} of @value{UPDATED-MONTH}.
+
+Copyright @copyright{} 2018, 2019 Andreas Enge, Fredrik Johansson;
+@var{firstname}.@var{name}@@inria.fr
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections. A copy of the license is included in the section
+entitled ``GNU Free Documentation License.''
+@end quotation
+@end copying
+
+@titlepage
+@title PariTwine
+@subtitle Edition @value{VERSION}
+@subtitle @value{UPDATED-MONTH}
+@author @value{AUTHORS}
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+
+@ifnottex
+@node Top
+@top PariTwine
+
+This manual documents how to install and use the PariTwine library,
+version @value{VERSION}
+@end ifnottex
+
+@ifnothtml
+@contents
+@end ifnothtml
+
+@menu
+* Copying::                     PariTwine Copying Conditions (GPL).
+* Introduction to PariTwine::   Brief introduction to PariTwine.
+* Installing PariTwine::        How to configure and compile PariTwine.
+* Using PariTwine::             How to use PariTwine in C code and GP.
+* Extending PariTwine::         How to add custom functionality to PariTwine.
+* GNU Free Documentation License::
+@end menu
+
+@node Copying
+@unnumbered PariTwine Copying Conditions
+
+PariTwine is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version.
+
+PariTwine is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see @uref{http://www.gnu.org/licenses/}.
+
+
+@node Introduction to PariTwine
+@chapter Introduction to PariTwine
+
+PariTwine is a glue library between the system for computer algebra and
+number theory PARI/GP and a number of other mathematics libraries,
+currently
+GMP (@uref{https://gmplib.org/}),
+GNU MPFR (@uref{http://www.mpfr.org/}),
+GNU MPC (@uref{http://www.multiprecision.org/mpc/}),
+FLINT (@uref{http://www.flintlib.org/}),
+ARB (@uref{http://arblib.org/})
+and
+CMH (@uref{http://cmh.gforge.inria.fr/}).
+
+PariTwine provides C functions to convert back and forth between basic types
+of PARI/GP and the other libraries, and it wraps a number of functions from
+the external libraries to be called from the PARI library with arguments
+of PARI type (otherwise said, @samp{GEN}).
+Finally PariTwine makes these wrapped functions available to GP scripts
+by installing them into the interpreter.
+
+
+
+@node Installing PariTwine
+@chapter Installing PariTwine
+
+To build PariTwine, you first have to install PARI/GP and all the desired
+libraries that you wish to wrap (at least GMP, and at your choice any of
+GNU MPFR, GNU MPC, FLINT, ARB and CMH) on your computer.
+You need a C compiler and a standard Unix @samp{make} program, plus some
+other standard Unix utility programs.
+
+
+@section Basic installation instructions
+
+Here are the steps needed to install the library on Unix systems:
+
+@enumerate
+@item
+@samp{tar xzf paritwine-@value{VERSION}.tar.gz}
+
+@item
+@samp{cd paritwine-@value{VERSION}}
+
+@item
+@samp{./configure}
+
+if dependencies are installed into standard directories, that is, directories
+that are searched by default by the compiler and the linking tools.
+
+@samp{./configure --with-gmp=DIR}
+
+is used to indicate a different location where GMP is installed.
+
+@samp{./configure --with-pari=DIR}
+
+is used to indicate a different location where PARI/GP is installed.
+
+@samp{./configure --with-mpfr=DIR}
+
+is used to indicate a different location where MPFR is installed.
+
+@samp{./configure --with-mpc=DIR}
+
+is used to indicate a different location where MPC is installed.
+
+@samp{./configure --with-flint=DIR}
+
+is used to indicate a different location where FLINT is installed.
+
+@samp{./configure --with-arb=DIR}
+
+is used to indicate a different location where ARB is installed.
+
+@samp{./configure --with-cmh=DIR}
+
+is used to indicate a different location where CMH is installed.
+
+For each package, separate search paths for the header and library
+files can be specified as follows:
+
+@samp{./configure --with-gmp-include=DIR}
+
+@samp{./configure --with-gmp-lib=DIR}
+
+and analogously for the other packages.
+
+
+Another useful parameter is @samp{--prefix}, which can be used to
+specify an alternative installation location instead of
+@file{/usr/local}; see @samp{make install} below.
+
+Use @samp{./configure --help} for an exhaustive list of parameters.
+
+@item
+@samp{make}
+
+This compiles PariTwine in the working directory.
+
+@item
+@samp{make check}
+
+This executes a number of tests on the compiled project.
+If you get error messages, please report them to the authors.
+
+@item
+@samp{make install}
+
+This copies the header files @file{paritwine-config.h} and
+@file{paritwine.h} into the directory @file{/usr/local/include},
+the static library @file{libparitwine.a} and the dynamic library
+@file{libparitwine.so} into the directory @file{/usr/local/lib},
+the GP script @file{paritwine.gp} into the directory
+@file{/usr/local/share/paritwine} and
+the manual @file{paritwine.info} into the directory
+@file{/usr/local/share/info}.
+If you passed the @samp{--prefix} option to @samp{configure}, the prefix
+directory given as argument to @samp{--prefix} is used instead of
+@file{/usr/local}.
+Note that you need write permissions on the prefix directory and its
+subdirectories.
+
+@end enumerate
+
+
+@section Other `make' Targets
+
+There are some other useful make targets:
+
+@itemize @bullet
+@item
+@samp{pdf}
+
+This creates a PDF version of the manual in @file{doc/paritwine.pdf}.
+
+@item
+@samp{html}
+
+This creates an HTML version of the manual, in several pages in the
+directory @file{doc/paritwine.html}; if you want only one output HTML file,
+then type @samp{makeinfo --html --no-split paritwine.texi} instead.
+
+@item
+@samp{clean}
+
+This deletes all object files and archive files, but not the configuration
+files.
+
+@item
+@samp{distclean}
+
+This has the same effect as @samp{make clean}, but it additionally deletes
+the configuration files created by @samp{./configure}.
+
+@item
+@samp{uninstall}
+
+This deletes all files copied by @samp{make install}.
+@end itemize
+
+
+
+@node Using PariTwine
+@chapter Using PariTwine
+
+
+PariTwine consists of essentially three parts:
+@itemize
+@item
+C functions for converting between the basic PARI types and the types
+of external libraries;
+@item
+C functions for wrapping functions of external libraries to be called with
+arguments of PARI types;
+@item
+a GP script to call these functions from within the GP command interpreter.
+@end itemize
+
+The following three sections describe these functionalities in order.
+
+
+@section Conversion functions
+
+Basically, for each external type @code{foo_t}, we provide two functions:
+
+@deftypefun void foo_set_GEN (foo_t @var{z}, GEN @var{x})
+Set the value of @var{z} from the PARI variable @var{x}, which needs to be
+of compatible type; otherwise, a PARI error is raised.
+@end deftypefun
+
+@deftypefun GEN foo_get_GEN (foo_t @var{z})
+Create from @var{z} a PARI object (of C type @code{GEN}) of suitable
+PARI type on the PARI stack and return it.
+@end deftypefun
+
+Functions operating on floating point numbers may take as additional argument
+a rounding mode and return an integer indicating the effective direction of
+rounding.
+
+
+@subsection Conversion functions for scalar types
+
+@deftypefun void mpz_set_GEN (mpz_t @var{z}, GEN @var{x})
+@deftypefunx void fmpz_set_GEN (fmpz_t @var{z}, GEN @var{x})
+Set the GMP or FLINT integer variable @var{z} to the value of @var{x},
+which must be of PARI type @code{t_INT}.
+@end deftypefun
+
+@deftypefun GEN mpz_get_GEN (mpz_t @var{z})
+@deftypefunx GEN fmpz_get_GEN (fmpz_t @var{z})
+From the GMP or FLINT integer @var{z} create a variable of PARI type
+@code{t_INT} on the PARI stack and return it.
+@end deftypefun
+
+
+@deftypefun void mpq_set_GEN (mpq_t @var{z}, GEN @var{x})
+@deftypefunx void fmpq_set_GEN (fmpq_t @var{z}, GEN @var{x})
+Set the GMP or FLINT rational variable @var{z} to the value of @var{x},
+which must be of PARI type @code{t_INT} or @code{t_FRAC}.
+@end deftypefun
+
+@deftypefun GEN mpq_get_GEN (mpq_t @var{z})
+@deftypefunx GEN fmpq_get_GEN (fmpq_t @var{z})
+From the GMP or FLINT rational @var{z} create a variable of PARI type
+@code{t_FRAC} on the PARI stack and return it.
+@end deftypefun
+
+
+@deftypefun int mpfr_set_GEN (mpfr_t @var{z}, GEN @var{x}, mpfr_rnd_t @var{rnd})
+Set the MPFR floating point variable @var{z} to the value of @var{x},
+which must be of PARI type @code{t_INT}, @code{t_FRAC} or @code{t_REAL}.
+The variable @var{z} must have been initialised to a given precision before,
+and the assigned value is the value of @var{x} rounded according to the
+rounding mode @var{rnd}; one possible choice is to use the constant
+@code{MPFR_RNDN} for rounding to nearest.
+The return value has the usual semantics of MPFR functions and indicates the
+effective direction of rounding: 0 if the result is exactly represented
+without rounding, a positive integer if the result is larger than the exact
+value and a negative integer if the result is smaller than the exact value.
+@end deftypefun
+
+@deftypefun GEN mpfr_get_GEN (mpfr_t @var{z})
+From the MPFR floating point number  @var{z} create a variable of PARI type
+@code{t_REAL} on the PARI stack and return it. The precision of the created
+variable is the minimal possible precision in PARI (a multiple of the word
+size) that is at least the bit precision of @var{z}.
+@end deftypefun
+
+
+@deftypefun int mpc_set_GEN (mpc_t @var{z}, GEN @var{x}, mpfr_rnd_t @var{rnd})
+Set the MPC floating point variable @var{z} to the value of @var{x},
+which must be of PARI type @code{t_INT}, @code{t_FRAC}, @code{t_REAL}
+or @code{t_COMPLEX}.
+The variable @var{z} must have been initialised to a given precision before,
+and the assigned value is the value of @var{x} rounded according to the
+rounding mode @var{rnd}; one possible choice is to use the constant
+@code{MPC_RNDNN} for rounding both the real and the imaginary part to nearest.
+The return value has the usual semantics of MPC functions and indicates the
+effective direction of rounding for the real and the imaginary part;
+for more details, see the MPC documentation.
+@end deftypefun
+
+@deftypefun GEN mpc_get_GEN (mpc_t @var{z})
+From the MPC floating point number  @var{z} create a variable of PARI type
+@code{t_COMPLEX} on the PARI stack and return it. The real and imaginary
+parts of the result are created using @code{mpfr_get_GEN}.
+So in particular their precisions are determined separately as the minimal
+possible precisions in PARI (multiples of the word size) that are at least
+the bit precisions of the corresponding parts of @var{z}.
+@end deftypefun
+
+
+@subsection Conversion functions for ball types
+
+@deftypefun void arf_set_GEN (arf_t @var{z}, GEN @var{x})
+@deftypefunx void mag_set_GEN (mag_t @var{z}, GEN @var{x})
+ARB implements two real floating point types, @code{arf_t} for holding
+the centre point of a real interval in ball representation at arbitrary
+precision, and @code{mag_t} for holding the radius of the interval
+(the ``magnitude of the error'') at small fixed precision.
+These two functions set the ARB floating point variable @var{z} to the
+value of @var{x}, which must be of PARI type @code{t_INT} or @code{t_REAL}.
+In the case of @var{z} of type @code{arf_t}, its precision is chosen minimal
+such that @var{x} can be stored exactly without rounding.
+In the case of @var{z} of type @code{mag_t}, the value is rounded up
+if necessary.
+@end deftypefun
+
+
+@deftypefun GEN arf_get_GEN (arf_t @var{z}, long @var{prec})
+@deftypefunx GEN mag_get_GEN (mag_t @var{z})
+From the ARB floating point number @var{z} create a PARI variable on the
+PARI stack and return it. If the value of @var{z} is 0, then the return
+value is of PARI type @code{t_INT}.
+Otherwise it is of PARI type @code{t_REAL}, and in the case of
+@code{arf_get_GEN}, the result is rounded to at least a precision of
+@var{prec} bits (precisely, to the next multiple of the word size);
+in the case of @code{mag_get_GEN}, a @code{t_REAL} of the minimal precision
+to hold the exact value of @var{z} is returned.
+@end deftypefun
+
+@deftypefun void arb_set_GEN (arb_t @var{z}, GEN @var{x}, long @var{prec})
+Set the ARB real ball variable @var{z} to the value of @var{x}, which can
+be of PARI type @code{t_INT}, @code{t_FRAC}, @code{t_REAL} or @code{t_VEC}.
+If @var{x} is not of PARI type @code{t_VEC}, then the interval
+has as centre @var{x} rounded to precision @var{prec} and is taken of minimal
+size to handle the rounding error.
+
+If @var{x} is of PARI type @code{t_VEC}, it is supposed to represent an
+interval itself, that is, it contains two elements representing the centre
+and the radius. These are transformed into an @code{arb_t} interval by calls
+to @code{arf_set_GEN} and @code{mag_set_GEN}, respectively, on the two
+components. This transformation does not use the parameter @var{prec} and
+thus preserves exactly the centre, and it potentially rounds up the radius.
+@end deftypefun
+
+@deftypefun GEN arb_get_GEN (arb_t @var{z}, long @var{prec})
+From the ARB real ball @var{z}, create a PARI variable on the PARI stack
+and return it. The result is of PARI type @code{t_VEC} with two elements
+and contains the interval in @var{z} as obtained by calls to
+@code{arf_get_GEN} and @code{mag_get_GEN}, respectively.
+@end deftypefun
+
+Notice that in a sequence of alternating calls to @code{arb_get_GEN} and
+@code{arb_set_GEN}, starting with either of them, and with the same value
+of @var{prec}, the first call may result in rounding if the value of
+@var{prec} is not large enough, or if the sequence starts with the conversion
+of a @code{t_FRAC}. In this case, the rounded ball always contains the
+input value. The subsequent calls will be lossless.
+
+@deftypefun void acb_set_GEN (acb_t @var{z}, GEN @var{x}, long @var{prec})
+In ARB, complex ``balls'' of type @code{acb_t} are implemented as a pair
+of real intervals of type @code{arb_t} representing the real and imaginary
+parts; so they are in fact rectangles in the complex plane.
+The same complex rectangle is represented in PARI in a ``transposed'' form,
+as a @code{t_VEC} with two elements of type @code{t_COMPLEX}, the first
+of which represents the centre of the rectangle, and the second of which
+represents the two radii in the real and the imaginary direction.
+
+If @var{x} is of PARI type @code{t_COMPLEX}, the resulting value of @var{z}
+is the smallest complex ball with centre @var{x} at precision @var{prec}.
+
+If @var{x} is of PARI type @code{t_INT}, @code{t_FRAC} or @code{t_REAL},
+the imaginary part of @var{z} is set to an exact 0, while its real part
+is set to a real ball by a call to @code{arb_set_GEN (z, x, prec)}.
+
+If @var{x} is of PARI type @code{t_VEC}, it is interpreted as a complex
+rectangle that is transformed into the corresponding @code{acb_t} rectangle
+@var{z} by calls to @code{arb_set_GEN}. This operation does not use the
+parameter @var{prec}, so that it preserves exactly the centre of the complex
+ball, while the real and imaginary radii may be rounded up.
+@end deftypefun
+
+
+@deftypefun GEN acb_get_GEN (acb_t @var{z}, long @var{prec})
+From the ARB complex ball @var{z}, create a PARI variable on the PARI stack
+and return it. The result is of PARI type @code{t_VEC} with two elements,
+each of which are of type @code{t_COMPLEX}; it represents the same complex
+rectangle as @var{z}, with the real and imaginary part of its centre
+rounded through calls to @code{arf_get_GEN}.
+
+Notice that as for real balls of type @code{arb_t}, in a sequence of
+alternating calls to @code{acb_set_GEN} and @code{acb_get_GEN} with
+the same precision, only the first call may lead to rounding (in which
+case the output ball contains the input ball), while all following ones
+are lossless.
+@end deftypefun
+
+
+@subsection Initialisation on the PARI stack
+
+For the GNU MPFR and GNU MPC libraries, the following initialisation
+functions, the names of which start with the prefix @code{pari_}, have a
+special behaviour: Exactly like their counterparts without the @code{pari_}
+prefix from the respective libraries, they initialise a variable of type
+@code{mpfr_t} or @code{mpc_t}, but they allocate their mantissae on the PARI
+stack. So they should not be freed with calls to @code{mpfr_clear} or
+@code {mpc_clear}, but with the usual PARI stack handling (also known as
+``avma magic''). They are used internally inside the wrappers for
+functions from MPFR and MPC, but they may also be more efficient for use
+in C code relying on @code{libpari} and requiring handling of the PARI stack
+anyway.
+
+@deftypefun void pari_mpfr_init2 (mpfr_t z, mpfr_prec_t prec)
+@deftypefunx void pari_mpc_init2 (mpc_t z, mpfr_prec_t prec)
+@deftypefunx void pari_mpc_init3 (mpc_t z, mpfr_prec_t prec_re, mpfr_prec_t prec_im)
+These are the counterparts of @code{mpfr_init2}, @code{mpc_init2} and
+@code{mpc_init3}. All of them take additional arguments to determine the
+bit precisions of the numbers (the @code{init2} variants) or of the real
+and imaginary part separately (@code{mpc_init3}).
+@end deftypefun
+
+There are also functions combining initialisations of MPFR or MPC numbers
+on the PARI stack with assignments of PARI numbers.
+
+@deftypefun void pari_mpfr_init_set_GEN (mpfr_t z, GEN x, mpfr_prec_t default_prec)
+Conceptually, this function combines a call to @code{pari_mpfr_init2} and
+@code{mpfr_set_GEN}. However, the precision handling is special and depends on
+the type of @var{x}:
+If @var{x} is of the floating point type @code{t_REAL}, the
+precision used for initialising @var{z} is the same as that of @var{x},
+so that the result fits without rounding.
+If @var{x} is of an exact type (@code{t_INT} or @code{t_FRAC}), however, the
+value of @var{default_prec} is used for initialising @var{z}.
+@end deftypefun
+
+@deftypefun void pari_mpc_init_set_GEN (mpc_t z, GEN x, mpfr_prec_t default_prec)
+This function calls @code{pari_mpfr_init_set_GEN} to initialise the real
+part of @var{z} and to assign the real part of @var{x} to it, and to
+separately initialise the complex part of @var{z} and to assign the complex
+part of @var{x} to it. Notice that the real and complex parts of @var{x} may
+have as types arbitrary combinations of @code{t_INT}, @code{t_FRAC} and
+@code{t_REAL}, and that the precision is determined by
+@code{pari_mpfr_init_set_GEN} independently for each part.
+@end deftypefun
+
+
+@section Wrapped library functions
+
+Besides providing functions to convert between PARI types and types of
+external libraries, a goal of PariTwine is to wrap functions from the
+external libraries so that they can be called directly from PARI with
+PARI type arguments, returning a PARI type result.
+
+Roughly speaking, if
+@code{void @var{lib}_@var{func} (@var{lib_t} @var{z}, @var{lib_t} @var{x},
+@var{lib_t} @var{y}, ...)}
+is a function from the library @var{lib} computing the mathematical function
+@var{func} in the arguments @var{x}, @var{y}, ... and assigning the result
+to @var{z}, where all these variables are of some type @var{lib_t} defined
+in @var{lib}, we wrap it to obtain a function
+@code{GEN pari_@var{lib}_@var{func} (GEN @var{x}, GEN @var{y}, ...,
+long @var{prec})} that uses
+@code{@var{lib}_@var{func}} to compute @var{func} on the PARI type arguments
+@var{x}, @var{y}, ... and that returns the result as a PARI object.
+The additional parameter @var{prec} determines the working precision (in bits)
+used in the external library and also the precision of the result.
+Usually functions in GNU MPFR and GNU MPC take as an additional parameter
+a rounding mode; this parameter is dropped in the wrapped function, where
+rounding to nearest is used.
+Functions in MPFR and MPC also usually have an @code{int} return value, which
+indicates the effective rounding direction of the result; this is discarded.
+For instance, the MPFR function computing the Riemann zeta function,
+@code {int mpfr_zeta (mpfr_t @var{z}, mpfr_t @var{x}, mpfr_rnd_t @var{rnd})}
+is wrapped to become
+@code {GEN pari_mpfr_zeta (GEN @var{x}, GEN @var{y}, long @var{prec})}.
+
+Currently, the following wrapped functions are available in PariTwine;
+see @ref{Extending PariTwine} for instructions on how to add more functions.
+
+@deftypefun  GEN pari_mpfr_add (GEN x, GEN y, long prec)
+@deftypefunx GEN pari_mpfr_sub (GEN x, GEN y, long prec)
+@deftypefunx GEN pari_mpfr_mul (GEN x, GEN y, long prec)
+@deftypefunx GEN pari_mpfr_sqr (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_div (GEN x, GEN y, long prec)
+@deftypefunx GEN pari_mpfr_sqrt (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_rec_sqrt (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_cbrt (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_pow (GEN x, GEN y, long prec)
+@deftypefunx GEN pari_mpfr_log (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_log2 (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_log10 (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_exp (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_exp2 (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_exp10 (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_sin (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_cos (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_tan (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_sec (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_csc (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_cot (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_acos (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_asin (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_atan (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_cosh (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_sinh (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_tanh (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_sech (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_csch (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_coth (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_acosh (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_asinh (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_atanh (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_log1p (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_expm1 (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_eint (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_li2 (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_gamma (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_lngamma (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_digamma (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_zeta (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_erf (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_erfc (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_j0 (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_j1 (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_y0 (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_y1 (GEN x, long prec)
+@deftypefunx GEN pari_mpfr_fma (GEN x, GEN y, GEN z, long prec)
+@deftypefunx GEN pari_mpfr_fms (GEN x, GEN y, GEN z, long prec)
+@deftypefunx GEN pari_mpfr_agm (GEN x, GEN y, long prec)
+@deftypefunx GEN pari_mpfr_hypot (GEN x, GEN y, long prec)
+@deftypefunx GEN pari_mpfr_ai (GEN x, long prec)
+These functions take arguments of types @code{t_INT}, @code{t_FRAC} or
+@code{t_REAL} and use GNU MPFR to return a result of type @code{t_REAL}.
+@end deftypefun
+
+@deftypefun  GEN pari_mpfr_fac_ui (unsigned long int t, long prec)
+This function takes as argument a small unsigned integer and
+returns its factorial as a number of type @code{t_REAL}.
+@end deftypefun
+
+@deftypefun  GEN pari_mpfr_jn (long int i, GEN x, long prec)
+@deftypefunx GEN pari_mpfr_yn (long int i, GEN x, long prec)
+These functions take as arguments a small integer and a number of type
+@code{t_INT}, @code{t_FRAC} or @code{t_REAL} and return a Bessel
+function of the given order of the first or second kind in the argument.
+@end deftypefun
+
+@deftypefun  GEN pari_mpc_add (GEN x, GEN y, long prec)
+@deftypefunx GEN pari_mpc_sub (GEN x, GEN y, long prec)
+@deftypefunx GEN pari_mpc_mul (GEN x, GEN y, long prec)
+@deftypefunx GEN pari_mpc_sqr (GEN x, long prec)
+@deftypefunx GEN pari_mpc_fma (GEN x, GEN y, GEN z, long prec)
+@deftypefunx GEN pari_mpc_div (GEN x, GEN y, long prec)
+@deftypefunx GEN pari_mpc_sqrt (GEN x, long prec)
+@deftypefunx GEN pari_mpc_pow (GEN x, GEN y, long prec)
+@deftypefunx GEN pari_mpc_exp (GEN x, long prec)
+@deftypefunx GEN pari_mpc_log (GEN x, long prec)
+@deftypefunx GEN pari_mpc_log10 (GEN x, long prec)
+@deftypefunx GEN pari_mpc_sin (GEN x, long prec)
+@deftypefunx GEN pari_mpc_cos (GEN x, long prec)
+@deftypefunx GEN pari_mpc_tan (GEN x, long prec)
+@deftypefunx GEN pari_mpc_sinh (GEN x, long prec)
+@deftypefunx GEN pari_mpc_cosh (GEN x, long prec)
+@deftypefunx GEN pari_mpc_tanh (GEN x, long prec)
+@deftypefunx GEN pari_mpc_asin (GEN x, long prec)
+@deftypefunx GEN pari_mpc_acos (GEN x, long prec)
+@deftypefunx GEN pari_mpc_atan (GEN x, long prec)
+@deftypefunx GEN pari_mpc_asinh (GEN x, long prec)
+@deftypefunx GEN pari_mpc_acosh (GEN x, long prec)
+@deftypefunx GEN pari_mpc_atanh (GEN x, long prec)
+These functions take arguments of types @code{t_INT}, @code{t_FRAC},
+@code{t_REAL} or @code{t_COMPLEX} and use GNU MPC to return a result
+of type @code{t_COMPLEX}.
+@end deftypefun
+
+@deftypefun  GEN pari_mpc_abs (GEN x, long prec)
+@deftypefunx GEN pari_mpc_norm (GEN x, long prec)
+These functions take arguments of types @code{t_INT}, @code{t_FRAC},
+@code{t_REAL} or @code{t_COMPLEX} and use MPC to return a result
+of type @code{t_REAL}.
+@end deftypefun
+
+@c @deftypefun  GEN pari_mpc_rootofunity (unsigned long int n, unsigned long int k, long prec)
+@c This function takes two small unsigned integers @math{n} and @math{k}
+@c and returns the root of unity @math{e^{2 \pi i k / n}}.
+@c @end deftypefun
+
+@deftypefun  GEN pari_cmh_I2I4I6I10 (GEN tau, long prec)
+@deftypefunx GEN pari_cmh_4theta (GEN tau, long prec)
+@deftypefunx GEN pari_cmh_10theta2 (GEN tau, long prec)
+These functions do not completely fit the generic description above and
+might change in the future. They take as input a 2x2-matrix @var{tau} of
+type @code{t_MAT} with entries of type @code{t_COMPLEX}, which is supposed
+to be an element of the Siegel half space; in particular, @var{tau} is
+symmetric, and its lower left entry is not used.
+They use the CMH library to compute and return a vector of type @code{t_VEC},
+containing four or ten elements of type @code{t_COMPLEX}.
+The first function computes the Igusa-Clebsch invariants @math{I_2},
+@math{I_4}, @math{I_6} and @math{I_{10}}.
+The second function computes the first four theta constants.
+The third function computes the squares of the ten non-zero theta constants.
+@end deftypefun
+
+@deftypefun GEN pari_acb_add (GEN x, GEN y, long prec)
+@deftypefunx GEN pari_acb_sub (GEN x, GEN y, long prec)
+@deftypefunx GEN pari_acb_mul (GEN x, GEN y, long prec)
+@deftypefunx GEN pari_acb_div (GEN x, GEN y, long prec)
+@deftypefunx GEN pari_acb_neg (GEN x, long prec)
+@deftypefunx GEN pari_acb_conj (GEN x, long prec)
+@deftypefunx GEN pari_acb_exp (GEN x, long prec)
+@deftypefunx GEN pari_acb_log (GEN x, long prec)
+@deftypefunx GEN pari_acb_atan (GEN x, long prec)
+@deftypefunx GEN pari_acb_sin (GEN x, long prec)
+@deftypefunx GEN pari_acb_cos (GEN x, long prec)
+@deftypefunx GEN pari_acb_gamma (GEN x, long prec)
+@deftypefunx GEN pari_acb_digamma (GEN x, long prec)
+@deftypefunx GEN pari_acb_zeta (GEN s, long prec)
+@deftypefunx GEN pari_acb_hurwitz_zeta (GEN s, GEN z, long prec)
+@deftypefunx GEN pari_acb_modular_eta (GEN tau, long prec)
+@deftypefunx GEN pari_acb_modular_j (GEN tau, long prec)
+@deftypefunx GEN pari_acb_modular_delta (GEN tau, long prec)
+@deftypefunx GEN pari_acb_elliptic_p (GEN z, GEN tau, long prec)
+@deftypefunx GEN pari_acb_elliptic_inv_p (GEN z, GEN tau, long prec)
+@deftypefunx GEN pari_acb_elliptic_zeta (GEN z, GEN tau, long prec)
+@deftypefunx GEN pari_acb_elliptic_sigma (GEN z, GEN tau, long prec)
+
+These functions take arguments of types @code{t_INT}, @code{t_FRAC},
+@code{t_REAL}, @code{t_COMPLEX} or @code{t_VEC} and return a result of
+type @code{t_VEC}. Here the @code{t_VEC} are vectors with two complex
+components, representing the centre and the radius of a complex rectangle.
+@end deftypefun
+
+Notice that unless the default precision is changed in between, it is safe
+to compose these functions operating on complex rectangles, since the
+conversion back and forth between GP and ARB is then lossless.
+In this way it is possible to build more complicated expressions using
+interval arithmetic all along, such that the final result contains the
+exact mathematical value.
+
+
+@deftypefun GEN pari_acb_modular_theta (GEN z, GEN tau, long prec)
+The function takes the same type of arguments as the previous ones,
+but instead of returning one result, it returns a @code{t_VEC} with
+four entries (each of which is a @code{t_VEC} representing a complex
+rectangle). It computes the four Jacobi theta functions
+@math{\theta_1}, @math{\theta_2}, @math{\theta_3} and @math{\theta_4}
+(in arb notation), which correspond to @math{-i \theta_{1,1}},
+@math{\theta_{1,0}}, @math{\theta_{0,0}} and @math{\theta_{0,1}}
+(in notation using half-integral characteristics).
+@end deftypefun
+
+
+@deftypefun GEN pari_acb_modular_eisenstein (GEN tau, long n, long prec)
+As the previous function, this one returns a @code{t_VEC}, but this time
+of length @var{n}, of complex rectangles. The vector contains the @var{n}
+first Eisenstein series @math{G_4}, @math{G_6}, @math{G_8},@dots{}
+@end deftypefun
+
+
+@deftypefun GEN pari_fmpz_numbpart (GEN x)
+@deftypefunx GEN pari_arb_numbpart (GEN x, long prec)
+
+These functions take an argument @var{x} of type @code{t_INT} and compute
+the partition number of @var{x}. The first one uses FLINT to return the
+exact @code{t_INT}, the second one uses ARB to return a real ball of type
+@code{t_VEC} at the given precision.
+@end deftypefun
+
+@section Calling wrapped functions from GP
+
+PariTwine provides a GP snippet, @code{paritwine.gp}, which can be used
+to integrate the wrapped functions from the external libraries into the
+GP command interpreter. This file is copied by @code{make install} into the
+subdirectory @code{share/paritwine} of the installation prefix
+(@code{/usr/local}, unless specified otherwise).
+To use it, issue the command
+@verbatim
+\r /usr/local/share/paritwine/paritwine.gp
+@end verbatim
+
+Roughly speaking, if
+@code{void @var{lib}_@var{func} (@var{lib_t} @var{z}, @var{lib_t} @var{x},
+@var{lib_t} @var{y}, ...)}
+is a function from the library @var{lib},
+wrapped as the C library function
+@code{GEN pari_@var{lib}_@var{func} (GEN @var{x}, GEN @var{y}, ...,
+long @var{prec})} on PARI types,
+inclusion of the above GP snippet makes a GP function available
+that can be called as 
+@code{@var{lib}_@var{func} (x, y, ...)}.
+The parameter @var{prec} is omitted and replaced by the current default
+bit precision.
+For instance, @code{mpfr_zeta (2)} uses GNU MPFR to compute the Riemann
+zeta function in the argument 2 at the current default precision.
+
+
+
+@node Extending PariTwine
+@chapter Extending PariTwine
+
+For wrapping a new function from an external library, one needs to add the
+wrapper function to one of the C files, a process that shall be illustrated 
+with the function @code{int mpfr_zeta (mpfr_t z, mpfr_t x, mpfr_rnd_t rnd)}
+(which already exists in PariTwine). The wrapper function could look like
+this:
+@verbatim
+GEN pari_mpfr_zeta (GEN x, long prec)
+{
+   pari_sp ltop = avma;
+   mpfr_prec_t p = prec;
+   mpfr_t z, z1;
+
+   pari_mpfr_init2 (z, p);
+   pari_mpfr_init_set_GEN (z1, x, p);
+
+   mpfr_zeta (z, z1, MPFR_RNDN);
+
+   return gerepileuptoleaf (ltop, mpfr_get_GEN (z));
+}
+@end verbatim
+
+The first line memorises the state of the PARI stack in the variable
+@code{ltop}. The second line casts the PARI precision of type @code{long}
+into an MPFR precision (which could be dropped, since in general the latter
+is also @code{long}).
+The next line declares two variables, @code{z1} to hold the MPFR version
+of the argument @code{x}, and @code{z} to hold the result of the computation.
+Then @code{z} is initialised on the PARI stack with the desired precision,
+and @code{z1} is initialised and set to @code{x}. Hereby if @code{x} is of
+type @code{t_INT} or @code{t_FRAC}, the precision @code{prec} is used; if it
+is of type @code{t_REAL}, its own precision is used, which may be different
+from @code{prec}.
+Then the function @code{mpfr_zeta} is called with rounding to nearest
+(@code{MPFR_RNDN}), which puts the result of the computation into @code{z}.
+The subexpression @code{mpfr_get_GEN (z)} adds an object of type
+@code{t_REAL} to the PARI stack with the same value as @code{z}.
+The surrounding call to @code{gerepileupto} deletes everything between
+@code{ltop} and this result on the PARI stack and returns a pointer to
+the result. So the effect of the function on the PARI stack is exactly
+to have added this result.
+
+The modified version of PariTwine is compiled and installed using
+@code{make install}.
+
+The next (optional) step is to make this new library function available
+in the GP command interpreter. This can be done issuing the command
+@verbatim
+install ("pari_mpfr_zeta", "Gb", "mpfr_zeta", "/usr/local/lib/libparitwine.so");
+@end verbatim
+@noindent
+It takes the function @code{pari_mpfr_zeta} from the shared library
+@code{/usr/local/lib/libparitwine.so} and installs it under the name of
+@code{mpfr_zeta}. The code @code{Gb} indicates that the function takes one
+argument of type @code{GEN} and also the current default bit precision of the
+GP environment; the latter is added automatically and need not be specified
+in the function call. The return value of type @code{GEN} is also understood.
+So now it is possible to call
+@verbatim
+Pisquareoversix = mpfr_zeta (2);
+@end verbatim
+@noindent
+in the GP interpreter.
+
+If you have extended PariTwine by wrapping more functions or adding a new
+external library, you may wish to contact the authors to have your
+modifications included into a future release.
+
+
+@node GNU Free Documentation License
+@appendix GNU Free Documentation License
+@include fdl-1.3.texi
+
+@bye
+
